@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Bridge – Blood Donation & Management System</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --crimson: #c0152a;
+      --crimson-dark: #8b0e1e;
+      --crimson-light: #e8294a;
+      --crimson-glow: rgba(192, 21, 42, 0.25);
+      --azure: #1a6bcc;
+      --azure-glow: rgba(26, 107, 204, 0.25);
+      --bg: #f7f4f2;
+      --surface: rgba(255, 255, 255, 0.7);
+      --surface2: rgba(255, 255, 255, 0.4);
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #1a1014;
+      --text2: #6b5a5e;
+      --text3: #9e8a8e;
+      --card-shadow: 0 4px 24px rgba(192, 21, 42, 0.08), 0 1px 4px rgba(0, 0, 0, 0.06);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dark {
+      --bg: #0e0a0b;
+      --surface: rgba(26, 16, 20, 0.65);
+      --surface2: rgba(35, 21, 25, 0.5);
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #f5eded;
+      --text2: #c4a8ae;
+      --text3: #7a6268;
+      --card-shadow: 0 4px 32px rgba(192, 21, 42, 0.18), 0 0 0 1px rgba(192, 21, 42, 0.12);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    /* AUTHENTICATION */
+    .auth-container {
+      max-width: 400px;
+      margin: 4rem auto;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 2rem;
+      letter-spacing: -1px;
+      margin-bottom: 2rem;
+    }
+
+    .auth-logo svg {
+      color: var(--crimson);
+      width: 40px;
+      height: 40px;
+    }
+
+    .auth-logo span {
+      background: linear-gradient(135deg, var(--crimson), var(--azure));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      background: var(--surface2);
+      padding: 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all var(--transition);
+    }
+
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--crimson);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* NAVBAR */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(192, 21, 42, 0.06)
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px
+    }
+
+    .nav-brand svg {
+      color: var(--crimson)
+    }
+
+    .nav-brand span {
+      background: linear-gradient(135deg, var(--crimson), var(--azure));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-family: 'Sora', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition)
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: var(--surface2);
+      color: var(--crimson)
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .dark-toggle {
+      width: 52px;
+      height: 28px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      position: relative;
+      transition: all var(--transition)
+    }
+
+    .dark-toggle::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: var(--crimson);
+      transition: all var(--transition)
+    }
+
+    .dark .dark-toggle::after {
+      left: 26px;
+      background: var(--azure)
+    }
+
+    /* LAYOUT */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.3s ease
+    }
+
+    .page.active {
+      display: block
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      margin-bottom: 2rem
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--text), var(--text2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .page-header p {
+      color: var(--text2);
+      margin-top: 4px;
+      font-size: 0.9rem
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all var(--transition)
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(192, 21, 42, 0.12)
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem
+    }
+
+    @media(max-width:768px) {
+      .grid-2 {
+        grid-template-columns: 1fr
+      }
+
+      .nav-links {
+        display: none
+      }
+    }
+
+    /* BLOOD GROUP CARDS */
+    .blood-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden
+    }
+
+    .blood-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--crimson-glow), transparent);
+      opacity: 0;
+      transition: opacity var(--transition)
+    }
+
+    .blood-card:hover::before {
+      opacity: 1
+    }
+
+    .blood-card.low {
+      border-color: var(--crimson);
+      animation: pulse-border 2s infinite
+    }
+
+    @keyframes pulse-border {
+
+      0%,
+      100% {
+        box-shadow: var(--card-shadow)
+      }
+
+      50% {
+        box-shadow: 0 0 0 3px var(--crimson-glow), var(--card-shadow)
+      }
+    }
+
+    .blood-type {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--crimson);
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .blood-units {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .blood-label {
+      font-size: 0.75rem;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .low-badge {
+      background: var(--crimson);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    /* STAT CARDS */
+    .stat-card {
+      background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+      color: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden
+    }
+
+    .stat-card.blue {
+      background: linear-gradient(135deg, var(--azure), #0e4f9e)
+    }
+
+    .stat-card.mixed {
+      background: linear-gradient(135deg, var(--crimson-dark), var(--azure))
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08)
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px
+    }
+
+    /* FORMS */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem
+    }
+
+    @media(max-width:600px) {
+      .form-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .form-group.full {
+      grid-column: 1/-1
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    input,
+    select,
+    textarea {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: all var(--transition);
+      outline: none;
+      width: 100%
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--crimson);
+      box-shadow: 0 0 0 3px var(--crimson-glow)
+    }
+
+    input::placeholder {
+      color: var(--text3)
+    }
+
+    select option {
+      background: var(--surface);
+      color: var(--text)
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition)
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+      color: white;
+      box-shadow: 0 4px 12px var(--crimson-glow)
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--crimson-glow)
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--crimson);
+      color: var(--crimson)
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, var(--azure), #0e4f9e);
+      color: white;
+      box-shadow: 0 4px 12px var(--azure-glow)
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 0.8rem
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th {
+      background: var(--surface2);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    td {
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text)
+    }
+
+    tr:last-child td {
+      border-bottom: none
+    }
+
+    tr:hover td {
+      background: var(--surface2)
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .badge-red {
+      background: rgba(192, 21, 42, 0.12);
+      color: var(--crimson)
+    }
+
+    .badge-blue {
+      background: rgba(26, 107, 204, 0.12);
+      color: var(--azure)
+    }
+
+    /* ALERT */
+    .alert {
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+      animation: slideIn 0.3s ease
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    .alert-success {
+      background: rgba(22, 163, 74, 0.12);
+      border: 1px solid rgba(22, 163, 74, 0.3);
+      color: #16a34a
+    }
+
+    .alert-error {
+      background: rgba(192, 21, 42, 0.1);
+      border: 1px solid rgba(192, 21, 42, 0.3);
+      color: var(--crimson)
+    }
+
+    .alert-warn {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #d97706
+    }
+
+    /* SEARCH BAR */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.5rem
+    }
+
+    .search-bar input {
+      flex: 1
+    }
+
+    .search-bar select {
+      width: 160px
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 50%, var(--azure) 100%);
+      border-radius: var(--radius);
+      padding: 3rem 2rem;
+      color: white;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero::before {
+      content: '🩸';
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 8rem;
+      opacity: 0.15
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.2
+    }
+
+    .hero p {
+      margin-top: 8px;
+      opacity: 0.85;
+      font-size: 0.95rem;
+      max-width: 500px
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap
+    }
+
+    .hero-stat {
+      text-align: center
+    }
+
+    .hero-stat-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .hero-stat-label {
+      font-size: 0.7rem;
+      opacity: 0.75;
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .urgent-banner {
+      background: linear-gradient(90deg, var(--crimson), var(--crimson-dark));
+      color: white;
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem
+    }
+
+    .pulse {
+      animation: pulse 1.5s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.5
+      }
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    /* AVAILABILITY ENTRIES */
+    .avail-entry {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px
+    }
+
+    .avail-entry select,
+    .avail-entry input {
+      flex: 1;
+      background: var(--surface);
+      margin: 0
+    }
+
+    .remove-btn {
+      background: rgba(192, 21, 42, 0.1);
+      border: none;
+      color: var(--crimson);
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition)
+    }
+
+    .remove-btn:hover {
+      background: var(--crimson);
+      color: white
+    }
+
+    /* HOSPITAL STOCK STYLES */
+    .hospital-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+
+    .hospital-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(192, 21, 42, 0.12);
+    }
+
+    .hospital-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .hospital-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .hospital-meta {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .h-stock-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: var(--surface2);
+      padding: 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    @media(max-width: 480px) {
+      .h-stock-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .h-stock-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 4px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .h-stock-pill:hover {
+      border-color: var(--crimson);
+      transform: scale(1.04);
+    }
+
+    .h-stock-pill.avail {
+      border-color: rgba(22, 163, 74, 0.3);
+    }
+
+    .h-stock-pill.low {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .h-stock-pill.empty {
+      border-color: rgba(192, 21, 42, 0.3);
+      background: rgba(192, 21, 42, 0.05);
+      opacity: 0.6;
+    }
+
+    .h-stock-type {
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--crimson);
+    }
+
+    .h-stock-count {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .hospital-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text3)
+    }
+
+    .empty svg {
+      opacity: 0.3;
+      margin-bottom: 1rem
+    }
+
+    .flex {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .flex-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    #particle-canvas {
+      position: fixed;
+      top: -10%;
+      left: -10%;
+      width: 120%;
+      height: 120%;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(80px);
+      opacity: 0.8;
+      transition: opacity var(--transition);
+    }
+
+    .dark #particle-canvas {
+      opacity: 0.6;
+    }
+
+    nav,
+    main {
+      position: relative;
+      z-index: 1
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="particle-canvas"></canvas>
+
+  <nav id="main-nav" style="display: none;">
+    <div class="nav-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C7 8 4 12 4 15.5A8 8 0 0020 15.5C20 12 17 8 12 2z" />
+      </svg>
+      <span>Blood Bridge</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="navigate('dashboard')">Dashboard</button>
+      <button class="nav-link" onclick="navigate('hospitals')">Hospital Stock</button>
+      <button class="nav-link" onclick="navigate('request')">Request Blood</button>
+      <button class="nav-link" onclick="navigate('register')">Register Donor</button>
+      <button class="nav-link" onclick="navigate('donors')">Donor History</button>
+      <button class="nav-link" onclick="navigate('stock')">Blood Stock</button>
+    </div>
+    <div class="nav-right">
+      <span id="nav-user-badge" class="badge badge-blue"
+        style="font-size: 0.8rem; padding: 5px 12px; display: none;"></span>
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()" style="padding: 6px 12px; border-radius: 20px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="margin-right: 4px; vertical-align: middle;">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+        </svg>
+        Logout
+      </button>
+      <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode"></button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- AUTHENTICATION -->
+    <div id="page-auth" class="page active">
+      <div class="auth-container">
+        <div class="auth-logo">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C7 8 4 12 4 15.5A8 8 0 0020 15.5C20 12 17 8 12 2z" />
+          </svg>
+          <span>Blood Bridge</span>
+        </div>
+        <div class="card">
+          <div class="auth-tabs">
+            <div class="auth-tab active" onclick="toggleAuth('login')">Login</div>
+            <div class="auth-tab" onclick="toggleAuth('register')">Register</div>
+          </div>
+
+          <div id="auth-alert"></div>
+
+          <div id="auth-login-form">
+            <div class="form-group" style="text-align: left; margin-bottom: 1rem;">
+              <label>Email address</label>
+              <input type="email" id="auth-email" placeholder="abc@gmail.com"
+                onkeydown="if(event.key==='Enter') doLogin()">
+            </div>
+            <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+              <label>Password</label>
+              <input type="password" id="auth-pass" placeholder="••••••••"
+                onkeydown="if(event.key==='Enter') doLogin()">
+            </div>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center" onclick="doLogin()">Sign
+              In</button>
+
+            <div
+              style="margin-top: 1.25rem; font-size: 0.78rem; color: var(--text3); text-align: center; border-top: 1px dashed var(--border); padding-top: 10px;">
+              Demo accounts: <strong>abc@gmail.com</strong> / <strong>123456</strong> or
+              <strong>admin@example.com</strong> / <strong>admin123</strong>
+            </div>
+          </div>
+
+          <div id="auth-register-form" style="display: none;">
+            <div class="form-group" style="text-align: left; margin-bottom: 1rem;">
+              <label>Full Name</label>
+              <input type="text" id="auth-reg-name" placeholder="John Doe"
+                onkeydown="if(event.key==='Enter') doRegister()">
+            </div>
+            <div class="form-group" style="text-align: left; margin-bottom: 1rem;">
+              <label>Email address</label>
+              <input type="email" id="auth-reg-email" placeholder="abc@gmail.com"
+                onkeydown="if(event.key==='Enter') doRegister()">
+            </div>
+            <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+              <label>Password</label>
+              <input type="password" id="auth-reg-pass" placeholder="••••••••"
+                onkeydown="if(event.key==='Enter') doRegister()">
+            </div>
+            <button class="btn btn-blue" style="width: 100%; justify-content: center" onclick="doRegister()">Create
+              Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
+      <div class="hero">
+        <h2>Save Lives.<br>Donate Blood.</h2>
+        <p>Manage donations, track blood stock across hospitals, and connect donors with those in need.</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-donors">0</div>
+            <div class="hero-stat-label">Donors</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-units">0</div>
+            <div class="hero-stat-label">Total Units</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-hospitals">0</div>
+            <div class="hero-stat-label">Hospitals</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-requests">0</div>
+            <div class="hero-stat-label">Requests</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-low">0</div>
+            <div class="hero-stat-label">Low Stock</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="urgent-alerts"></div>
+
+      <div class="flex-between" style="margin-bottom: 1rem;">
+        <div class="section-title" style="margin-bottom: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--crimson)">
+            <path d="M12 2C7 8 4 12 4 15.5A8 8 0 0020 15.5C20 12 17 8 12 2z" />
+          </svg>
+          Overall Blood Stock
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('hospitals')">View Hospital Availability →</button>
+      </div>
+      <div class="grid-4" id="dash-stock"></div>
+
+      <div class="divider"></div>
+
+      <!-- Quick Hospital Stock Snapshot -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="flex-between" style="margin-bottom: 1rem;">
+          <div class="section-title" style="margin-bottom:0">🏥 Partner Hospitals Live Availability</div>
+          <button class="btn btn-secondary btn-sm" onclick="navigate('hospitals')">Full Hospital Directory</button>
+        </div>
+        <div id="dash-hospitals-preview" class="grid-2"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title">📋 Recent Donors</div>
+          <div id="recent-donors"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">📥 Recent Requests</div>
+          <div id="recent-requests"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOSPITALS & BLOOD AVAILABILITY -->
+    <div id="page-hospitals" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>🏥 Hospital Blood Availability</h1>
+          <p>Check live blood stock across partner hospitals and request blood directly.</p>
+        </div>
+        <span id="hospital-count-badge" class="badge badge-blue">0 Hospitals</span>
+      </div>
+
+      <div id="hospital-alert"></div>
+
+      <div class="search-bar">
+        <input id="search-hospital" type="text" placeholder="Search by hospital name or city/location..."
+          oninput="renderHospitals()">
+        <select id="filter-hospital-blood" onchange="renderHospitals()">
+          <option value="">All Blood Groups</option>
+          <option>A+</option>
+          <option>A-</option>
+          <option>B+</option>
+          <option>B-</option>
+          <option>O+</option>
+          <option>O-</option>
+          <option>AB+</option>
+          <option>AB-</option>
+        </select>
+        <select id="filter-hospital-status" onchange="renderHospitals()">
+          <option value="">All Availability</option>
+          <option value="avail">In Stock (>0 units)</option>
+          <option value="low">Low / Urgent Stock (≤3 units)</option>
+        </select>
+      </div>
+
+      <div class="grid-2" id="hospitals-list"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="page-register" class="page">
+      <div class="page-header">
+        <h1>Register Donor</h1>
+        <p>Fill in the form below to register a new blood donor.</p>
+      </div>
+      <div id="reg-alert"></div>
+      <div class="card">
+        <div class="section-title">Personal Information</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name *</label><input id="r-name" type="text" placeholder="John Doe"></div>
+          <div class="form-group"><label>Age *</label><input id="r-age" type="number" placeholder="18" min="18"
+              max="65"></div>
+          <div class="form-group"><label>Gender *</label>
+            <select id="r-gender">
+              <option value="">Select gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Blood Group *</label>
+            <select id="r-blood">
+              <option value="">Select blood group</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>O+</option>
+              <option>O-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Phone *</label><input id="r-phone" type="tel" placeholder="+91 9999999999">
+          </div>
+          <div class="form-group"><label>Email *</label><input id="r-email" type="email" placeholder="john@example.com">
+          </div>
+          <div class="form-group full"><label>Address</label><input id="r-address" type="text"
+              placeholder="City, State"></div>
+          <div class="form-group"><label>Last Donation Date</label><input id="r-lastdon" type="date"></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-title">Donation Availability</div>
+        <div id="avail-list"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addAvail()" style="margin-top:8px">+ Add Availability
+          Slot</button>
+
+        <div class="divider"></div>
+        <div class="flex-between">
+          <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+          <button class="btn btn-primary" onclick="registerDonor()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Register Donor
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONORS -->
+    <div id="page-donors" class="page">
+      <div class="page-header flex-between">
+        <div>
+          <h1>Donor History</h1>
+          <p>All registered blood donors.</p>
+        </div>
+        <span id="donor-count-badge" class="badge badge-red">0 donors</span>
+      </div>
+      <div class="search-bar">
+        <input id="search-name" type="text" placeholder="Search by name..." oninput="renderDonors()">
+        <select id="filter-blood" onchange="renderDonors()">
+          <option value="">All Blood Groups</option>
+          <option>A+</option>
+          <option>A-</option>
+          <option>B+</option>
+          <option>B-</option>
+          <option>O+</option>
+          <option>O-</option>
+          <option>AB+</option>
+          <option>AB-</option>
+        </select>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Blood Group</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Registered</th>
+                <th>Availability</th>
+              </tr>
+            </thead>
+            <tbody id="donors-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STOCK -->
+    <div id="page-stock" class="page">
+      <div class="page-header">
+        <h1>Blood Stock Management</h1>
+        <p>Current central inventory of blood units by group.</p>
+      </div>
+      <div id="stock-alerts" style="margin-bottom:1rem"></div>
+      <div class="grid-4" id="stock-cards"></div>
+      <div class="divider"></div>
+      <div class="card">
+        <div class="section-title">Manually Adjust Central Stock</div>
+        <div class="flex" style="gap:12px;flex-wrap:wrap">
+          <select id="adj-blood" style="width:160px">
+            <option value="">Blood Group</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+          </select>
+          <input id="adj-units" type="number" placeholder="Units (use negative to deduct)" style="width:240px">
+          <button class="btn btn-primary" onclick="adjustStock()">Update Stock</button>
+        </div>
+        <div id="adj-alert" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- REQUEST -->
+    <div id="page-request" class="page">
+      <div class="page-header">
+        <h1>Request Blood</h1>
+        <p>Submit a blood request for a patient from a hospital or central bank.</p>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div id="req-alert"></div>
+          <div class="card">
+            <div class="section-title">Request Form</div>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Select Hospital / Blood Center *</label>
+                <select id="q-hospital" onchange="onReqHospitalChange()"></select>
+              </div>
+              <div class="form-group full"><label>Patient Name *</label><input id="q-name" type="text"
+                  placeholder="Patient full name"></div>
+              <div class="form-group"><label>Blood Group *</label>
+                <select id="q-blood" onchange="onReqBloodChange()">
+                  <option value="">Select group</option>
+                  <option>A+</option>
+                  <option>A-</option>
+                  <option>B+</option>
+                  <option>B-</option>
+                  <option>O+</option>
+                  <option>O-</option>
+                  <option>AB+</option>
+                  <option>AB-</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Units Required *</label><input id="q-units" type="number" placeholder="1"
+                  min="1" value="1"></div>
+              <div class="form-group full"><label>Contact *</label><input id="q-contact" type="text"
+                  placeholder="Phone number or email"></div>
+            </div>
+            <div class="divider"></div>
+            <button class="btn btn-blue" onclick="submitRequest()" style="width:100%;justify-content:center">Submit
+              Request</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="section-title flex-between">
+              <span id="req-stock-title">Available Stock</span>
+              <span id="req-stock-badge" class="badge badge-blue">Central Stock</span>
+            </div>
+            <div id="req-stock"></div>
+          </div>
+          <div class="card" style="margin-top:1rem">
+            <div class="section-title">Request History</div>
+            <div id="req-history"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ──────────────────────────────────────────
+    // DATA STORE (localStorage-backed)
+    // ──────────────────────────────────────────
+    const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
+    const LOW_THRESHOLD = 3;
+
+    const DEFAULT_USERS = [
+      { name: 'Demo User', email: 'abc@gmail.com', pass: '123456' },
+      { name: 'Admin', email: 'admin@example.com', pass: 'admin123' }
+    ];
+
+    const DEFAULT_HOSPITALS = [
+      {
+        id: 'h1',
+        name: 'City Care General Hospital',
+        city: 'Central District',
+        phone: '+91 98765 43210',
+        address: 'Plot 42, Health City, Central District',
+        stock: { 'A+': 12, 'A-': 4, 'B+': 16, 'B-': 5, 'O+': 22, 'O-': 6, 'AB+': 8, 'AB-': 2 }
+      },
+      {
+        id: 'h2',
+        name: 'Apollo Life Care Hospital',
+        city: 'North Zone',
+        phone: '+91 98111 22334',
+        address: 'Sector 14, Ring Road, North Zone',
+        stock: { 'A+': 15, 'A-': 3, 'B+': 10, 'B-': 4, 'O+': 19, 'O-': 8, 'AB+': 6, 'AB-': 1 }
+      },
+      {
+        id: 'h3',
+        name: 'Red Cross Regional Blood Center',
+        city: 'East Wing',
+        phone: '+91 97654 32109',
+        address: 'Red Cross Bhavan, East Wing Bypass',
+        stock: { 'A+': 28, 'A-': 9, 'B+': 32, 'B-': 11, 'O+': 40, 'O-': 14, 'AB+': 15, 'AB-': 5 }
+      },
+      {
+        id: 'h4',
+        name: 'Metro Multispecialty Hospital',
+        city: 'South Avenue',
+        phone: '+91 99887 76655',
+        address: '88 South Avenue, Near Metro Station',
+        stock: { 'A+': 8, 'A-': 2, 'B+': 14, 'B-': 3, 'O+': 15, 'O-': 3, 'AB+': 4, 'AB-': 0 }
+      },
+      {
+        id: 'h5',
+        name: 'St. Jude Memorial Hospital',
+        city: 'West Boulevard',
+        phone: '+91 91234 56780',
+        address: 'Highway Circle, West Boulevard',
+        stock: { 'A+': 6, 'A-': 1, 'B+': 7, 'B-': 2, 'O+': 11, 'O-': 2, 'AB+': 3, 'AB-': 1 }
+      }
+    ];
+
+    function load(key, def) {
+      try {
+        const item = localStorage.getItem(key);
+        if (!item) return def;
+        const parsed = JSON.parse(item);
+        return (parsed !== null && parsed !== undefined) ? parsed : def;
+      } catch (e) {
+        return def;
+      }
+    }
+
+    function save(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {
+        console.error('Save error:', e);
+      }
+    }
+
+    let bb_users = load('bb_users', DEFAULT_USERS);
+    if (!bb_users || !bb_users.length) {
+      bb_users = [...DEFAULT_USERS];
+      save('bb_users', bb_users);
+    }
+
+    let donors = load('bb_donors', []);
+    let hospitals = load('bb_hospitals', DEFAULT_HOSPITALS);
+    if (!hospitals || !hospitals.length) {
+      hospitals = [...DEFAULT_HOSPITALS];
+      save('bb_hospitals', hospitals);
+    }
+
+    // Default stock calculated from hospitals or fallback
+    function calcTotalStock() {
+      const tot = Object.fromEntries(BLOOD_GROUPS.map(g => [g, 0]));
+      hospitals.forEach(h => {
+        BLOOD_GROUPS.forEach(g => {
+          tot[g] += (h.stock && h.stock[g]) || 0;
+        });
+      });
+      return tot;
+    }
+
+    let stock = load('bb_stock', null);
+    if (!stock) {
+      stock = calcTotalStock();
+      save('bb_stock', stock);
+    }
+
+    let requests = load('bb_requests', []);
+
+    function saveAll() {
+      save('bb_users', bb_users);
+      save('bb_donors', donors);
+      save('bb_hospitals', hospitals);
+      save('bb_stock', stock);
+      save('bb_requests', requests);
+    }
+
+    // ──────────────────────────────────────────
+    // AUTHENTICATION & SESSION MANAGEMENT
+    // ──────────────────────────────────────────
+    function toggleAuth(type) {
+      const alertEl = document.getElementById('auth-alert');
+      if (alertEl) alertEl.innerHTML = '';
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      if (type === 'login') {
+        document.querySelector('.auth-tab:nth-child(1)')?.classList.add('active');
+        document.getElementById('auth-login-form').style.display = 'block';
+        document.getElementById('auth-register-form').style.display = 'none';
+      } else {
+        document.querySelector('.auth-tab:nth-child(2)')?.classList.add('active');
+        document.getElementById('auth-login-form').style.display = 'none';
+        document.getElementById('auth-register-form').style.display = 'block';
+      }
+    }
+
+    function doRegister() {
+      const name = document.getElementById('auth-reg-name').value.trim();
+      const email = document.getElementById('auth-reg-email').value.trim().toLowerCase();
+      const pass = document.getElementById('auth-reg-pass').value;
+
+      if (!name || !email || !pass) {
+        showAlert('auth-alert', 'error', 'Please fill in all registration fields.');
+        return;
+      }
+
+      if (bb_users.some(u => u.email.toLowerCase() === email)) {
+        showAlert('auth-alert', 'error', 'An account with this email already exists. Please log in.');
+        return;
+      }
+
+      const newUser = { name, email, pass, createdAt: new Date().toISOString() };
+      bb_users.push(newUser);
+      save('bb_users', bb_users);
+
+      document.getElementById('auth-reg-name').value = '';
+      document.getElementById('auth-reg-email').value = '';
+      document.getElementById('auth-reg-pass').value = '';
+
+      showAlert('auth-alert', 'success', 'Account registered successfully! Please log in.');
+      toggleAuth('login');
+      document.getElementById('auth-email').value = email;
+      document.getElementById('auth-pass').focus();
+    }
+
+    function doLogin() {
+      const emailInput = document.getElementById('auth-email');
+      const passInput = document.getElementById('auth-pass');
+      const email = (emailInput ? emailInput.value : '').trim().toLowerCase();
+      const pass = passInput ? passInput.value : '';
+
+      if (!email || !pass) {
+        showAlert('auth-alert', 'error', 'Please enter your email and password.');
+        return;
+      }
+
+      // Reload users from localStorage to ensure freshly saved accounts are captured
+      bb_users = load('bb_users', DEFAULT_USERS);
+
+      const user = bb_users.find(u => u.email.toLowerCase() === email && u.pass === pass);
+      if (!user) {
+        showAlert('auth-alert', 'error', 'Invalid email or password. Please check your credentials or register first.');
+        return;
+      }
+
+      // Save active logged in session
+      save('bb_current_user', { name: user.name, email: user.email });
+
+      if (emailInput) emailInput.value = '';
+      if (passInput) passInput.value = '';
+
+      updateUserBadge(user);
+      navigate('dashboard');
+    }
+
+    function doLogout() {
+      localStorage.removeItem('bb_current_user');
+      const badge = document.getElementById('nav-user-badge');
+      if (badge) badge.style.display = 'none';
+      navigate('auth');
+    }
+
+    function updateUserBadge(user) {
+      const badge = document.getElementById('nav-user-badge');
+      if (badge && user) {
+        badge.textContent = `👤 ${user.name || user.email}`;
+        badge.style.display = 'inline-block';
+      }
+    }
+
+    function navigate(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+      const pageEl = document.getElementById('page-' + page);
+      if (pageEl) pageEl.classList.add('active');
+
+      const navEl = document.getElementById('main-nav');
+      if (navEl) {
+        if (page === 'auth') {
+          navEl.style.display = 'none';
+        } else {
+          navEl.style.display = 'flex';
+        }
+      }
+
+      document.querySelectorAll('.nav-link').forEach(l => {
+        const text = l.textContent.toLowerCase();
+        if (
+          (page === 'dashboard' && text.includes('dashboard')) ||
+          (page === 'hospitals' && text.includes('hospital')) ||
+          (page === 'request' && text.includes('request')) ||
+          (page === 'register' && text.includes('register')) ||
+          (page === 'donors' && text.includes('donor')) ||
+          (page === 'stock' && text.includes('stock'))
+        ) {
+          l.classList.add('active');
+        }
+      });
+
+      if (page !== 'auth') {
+        renderAll();
+      }
+    }
+
+    // ──────────────────────────────────────────
+    // DARK MODE
+    // ──────────────────────────────────────────
+    let isDark = load('bb_dark', false);
+    if (isDark) document.body.classList.add('dark');
+
+    function toggleDark() {
+      isDark = !isDark;
+      document.body.classList.toggle('dark', isDark);
+      save('bb_dark', isDark);
+    }
+
+    // ──────────────────────────────────────────
+    // AVAILABILITY SLOTS
+    // ──────────────────────────────────────────
+    let availSlots = [];
+
+    function addAvail() {
+      const id = Date.now();
+      availSlots.push({ id, date: '', slot: 'Morning' });
+      renderAvail();
+    }
+
+    function removeAvail(id) {
+      availSlots = availSlots.filter(s => s.id !== id);
+      renderAvail();
+    }
+
+    function renderAvail() {
+      const el = document.getElementById('avail-list');
+      if (!el) return;
+      if (!availSlots.length) { el.innerHTML = '<p style="color:var(--text3);font-size:0.85rem">No availability slots added.</p>'; return; }
+      el.innerHTML = availSlots.map(s => `
+        <div class="avail-entry">
+          <input type="date" value="${s.date}" onchange="availSlots.find(x=>x.id==${s.id}).date=this.value" style="flex:1">
+          <select onchange="availSlots.find(x=>x.id==${s.id}).slot=this.value">
+            <option ${s.slot === 'Morning' ? 'selected' : ''}>Morning</option>
+            <option ${s.slot === 'Afternoon' ? 'selected' : ''}>Afternoon</option>
+            <option ${s.slot === 'Evening' ? 'selected' : ''}>Evening</option>
+          </select>
+          <button class="remove-btn" onclick="removeAvail(${s.id})">×</button>
+        </div>
+      `).join('');
+    }
+    renderAvail();
+
+    // ──────────────────────────────────────────
+    // REGISTER DONOR
+    // ──────────────────────────────────────────
+    function showAlert(elId, type, msg) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => { if (el) el.innerHTML = ''; }, 4000);
+    }
+
+    function registerDonor() {
+      const name = document.getElementById('r-name').value.trim();
+      const age = document.getElementById('r-age').value;
+      const gender = document.getElementById('r-gender').value;
+      const blood = document.getElementById('r-blood').value;
+      const phone = document.getElementById('r-phone').value.trim();
+      const email = document.getElementById('r-email').value.trim();
+      const address = document.getElementById('r-address').value.trim();
+      const lastdon = document.getElementById('r-lastdon').value;
+
+      if (!name || !age || !gender || !blood || !phone || !email) {
+        showAlert('reg-alert', 'error', 'Please fill in all required fields.');
+        return;
+      }
+      if (parseInt(age) < 18 || parseInt(age) > 65) {
+        showAlert('reg-alert', 'error', 'Donor age must be between 18 and 65.');
+        return;
+      }
+      if (donors.find(d => d.phone === phone)) {
+        showAlert('reg-alert', 'error', 'A donor with this phone number is already registered.');
+        return;
+      }
+      if (donors.find(d => d.email.toLowerCase() === email.toLowerCase())) {
+        showAlert('reg-alert', 'error', 'A donor with this email is already registered.');
+        return;
+      }
+
+      const donor = {
+        id: Date.now(),
+        name, age: parseInt(age), gender, blood, phone, email, address, lastdon,
+        regDate: new Date().toISOString().split('T')[0],
+        availability: availSlots.filter(s => s.date).map(s => ({ date: s.date, slot: s.slot }))
+      };
+
+      donors.push(donor);
+      stock[blood] = (stock[blood] || 0) + 1;
+
+      // Also add 1 unit to the first hospital default bank
+      if (hospitals.length > 0) {
+        hospitals[0].stock[blood] = (hospitals[0].stock[blood] || 0) + 1;
+      }
+
+      saveAll();
+
+      showAlert('reg-alert', 'success', `✅ ${name} registered successfully! Blood stock for ${blood} updated.`);
+      clearForm();
+      renderAll();
+    }
+
+    function clearForm() {
+      ['r-name', 'r-age', 'r-gender', 'r-blood', 'r-phone', 'r-email', 'r-address', 'r-lastdon']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      availSlots = [];
+      renderAvail();
+    }
+
+    // ──────────────────────────────────────────
+    // RENDER DONORS
+    // ──────────────────────────────────────────
+    function renderDonors() {
+      const nameQ = (document.getElementById('search-name')?.value || '').toLowerCase();
+      const bloodQ = document.getElementById('filter-blood')?.value || '';
+      let filtered = donors.filter(d =>
+        (!nameQ || d.name.toLowerCase().includes(nameQ)) &&
+        (!bloodQ || d.blood === bloodQ)
+      );
+      const badge = document.getElementById('donor-count-badge');
+      if (badge) badge.textContent = `${filtered.length} donor${filtered.length !== 1 ? 's' : ''}`;
+
+      const tbody = document.getElementById('donors-tbody');
+      if (!tbody) return;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty">No donors found.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filtered.map((d, i) => `
+        <tr>
+          <td style="color:var(--text3);font-family:'JetBrains Mono',monospace">${i + 1}</td>
+          <td><strong>${d.name}</strong></td>
+          <td>${d.age}</td>
+          <td><span class="badge badge-red">${d.blood}</span></td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:0.8rem">${d.phone}</td>
+          <td style="font-size:0.8rem">${d.email}</td>
+          <td style="color:var(--text2);font-size:0.8rem">${d.regDate}</td>
+          <td style="font-size:0.8rem">${d.availability?.length ? d.availability.map(a => `${a.date} ${a.slot}`).join('<br>') : '<span style="color:var(--text3)">—</span>'}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ──────────────────────────────────────────
+    // RENDER HOSPITALS & BLOOD AVAILABILITY
+    // ──────────────────────────────────────────
+    function renderHospitals() {
+      const searchQ = (document.getElementById('search-hospital')?.value || '').toLowerCase();
+      const bloodQ = document.getElementById('filter-hospital-blood')?.value || '';
+      const statusQ = document.getElementById('filter-hospital-status')?.value || '';
+
+      const container = document.getElementById('hospitals-list');
+      const countBadge = document.getElementById('hospital-count-badge');
+
+      let filtered = hospitals.filter(h => {
+        const matchesSearch = !searchQ || h.name.toLowerCase().includes(searchQ) || h.city.toLowerCase().includes(searchQ) || (h.address && h.address.toLowerCase().includes(searchQ));
+
+        let matchesBlood = true;
+        if (bloodQ) {
+          const units = (h.stock && h.stock[bloodQ]) || 0;
+          matchesBlood = units > 0;
+        }
+
+        let matchesStatus = true;
+        if (statusQ === 'avail') {
+          const totalUnits = BLOOD_GROUPS.reduce((acc, g) => acc + ((h.stock && h.stock[g]) || 0), 0);
+          matchesStatus = totalUnits > 0;
+        } else if (statusQ === 'low') {
+          const hasLow = BLOOD_GROUPS.some(g => {
+            const u = (h.stock && h.stock[g]) || 0;
+            return u > 0 && u <= LOW_THRESHOLD;
+          });
+          matchesStatus = hasLow;
+        }
+
+        return matchesSearch && matchesBlood && matchesStatus;
+      });
+
+      if (countBadge) {
+        countBadge.textContent = `${filtered.length} Hospital${filtered.length !== 1 ? 's' : ''}`;
+      }
+
+      if (!container) return;
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="card empty" style="grid-column: 1/-1;">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">🏥</div>
+            <h3>No hospitals matched your search</h3>
+            <p style="color:var(--text3); font-size: 0.85rem; margin-top: 4px;">Try clearing filters or search query.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(h => {
+        const totalUnits = BLOOD_GROUPS.reduce((acc, g) => acc + ((h.stock && h.stock[g]) || 0), 0);
+
+        const stockPills = BLOOD_GROUPS.map(g => {
+          const units = (h.stock && h.stock[g]) || 0;
+          let pillClass = 'avail';
+          if (units === 0) pillClass = 'empty';
+          else if (units <= LOW_THRESHOLD) pillClass = 'low';
+
+          return `
+            <div class="h-stock-pill ${pillClass}" onclick="quickRequestHospital('${h.id}', '${g}')" title="Click to request ${g} from ${h.name}">
+              <span class="h-stock-type">${g}</span>
+              <span class="h-stock-count">${units}</span>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="hospital-card">
+            <div>
+              <div class="hospital-header">
+                <div>
+                  <div class="hospital-title">🏥 ${h.name}</div>
+                  <div class="hospital-meta">
+                    <span>📍 ${h.address} (${h.city})</span>
+                    <span>📞 Helpline: <a href="tel:${h.phone}" style="color:var(--azure);text-decoration:none;font-weight:600">${h.phone}</a></span>
+                  </div>
+                </div>
+                <span class="badge ${totalUnits > 15 ? 'badge-blue' : 'badge-red'}">${totalUnits} total units</span>
+              </div>
+              
+              <div style="margin: 1rem 0 0.5rem; font-size: 0.75rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px;">
+                Available Blood Stock by Group:
+              </div>
+              <div class="h-stock-grid">
+                ${stockPills}
+              </div>
+            </div>
+
+            <div class="hospital-actions flex-between" style="border-top: 1px solid var(--border); padding-top: 10px;">
+              <span style="font-size: 0.75rem; color: var(--text3);">Click any group or button to request</span>
+              <button class="btn btn-primary btn-sm" onclick="quickRequestHospital('${h.id}')">
+                Request Blood
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickRequestHospital(hospitalId, bloodGroup = '') {
+      navigate('request');
+      const hospSelect = document.getElementById('q-hospital');
+      if (hospSelect) {
+        hospSelect.value = hospitalId;
+        onReqHospitalChange();
+      }
+      if (bloodGroup) {
+        const bloodSelect = document.getElementById('q-blood');
+        if (bloodSelect) {
+          bloodSelect.value = bloodGroup;
+          onReqBloodChange();
+        }
+      }
+      document.getElementById('q-name')?.focus();
+    }
+
+    // ──────────────────────────────────────────
+    // RENDER STOCK
+    // ──────────────────────────────────────────
+    function renderStockCards(containerId) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = BLOOD_GROUPS.map(g => {
+        const u = stock[g] || 0;
+        const low = u <= LOW_THRESHOLD;
+        return `
+          <div class="blood-card ${low ? 'low' : ''}">
+            <div class="blood-type">${g}</div>
+            <div class="blood-units">${u}</div>
+            <div class="blood-label">units</div>
+            ${low ? '<span class="low-badge">LOW</span>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderStockAlerts(elId) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const low = BLOOD_GROUPS.filter(g => (stock[g] || 0) <= LOW_THRESHOLD);
+      if (!low.length) { el.innerHTML = ''; return; }
+      el.innerHTML = `
+        <div class="urgent-banner">
+          <span class="pulse">🚨</span>
+          <strong>URGENT:</strong> Low central stock for ${low.join(', ')}. Immediate donations or hospital transfers needed!
+        </div>
+      `;
+    }
+
+    function adjustStock() {
+      const blood = document.getElementById('adj-blood').value;
+      const units = parseInt(document.getElementById('adj-units').value);
+      if (!blood) { showAlert('adj-alert', 'error', 'Please select a blood group.'); return; }
+      if (isNaN(units)) { showAlert('adj-alert', 'error', 'Please enter a valid unit amount.'); return; }
+      const newVal = (stock[blood] || 0) + units;
+      if (newVal < 0) { showAlert('adj-alert', 'error', 'Cannot reduce below 0 units.'); return; }
+      stock[blood] = newVal;
+      saveAll();
+      showAlert('adj-alert', 'success', `Central blood stock for ${blood} updated to ${newVal} units.`);
+      renderAll();
+    }
+
+    // ──────────────────────────────────────────
+    // BLOOD REQUEST
+    // ──────────────────────────────────────────
+    function populateHospitalDropdown() {
+      const el = document.getElementById('q-hospital');
+      if (!el) return;
+      const currentVal = el.value;
+      let opts = `<option value="all">🏢 Central Blood Bank (Combined Inventory)</option>`;
+      hospitals.forEach(h => {
+        opts += `<option value="${h.id}">🏥 ${h.name} (${h.city})</option>`;
+      });
+      el.innerHTML = opts;
+      if (currentVal) el.value = currentVal;
+    }
+
+    function onReqHospitalChange() {
+      renderReqStock();
+    }
+
+    function onReqBloodChange() {
+      renderReqStock();
+    }
+
+    function submitRequest() {
+      const hospId = document.getElementById('q-hospital')?.value || 'all';
+      const name = document.getElementById('q-name').value.trim();
+      const blood = document.getElementById('q-blood').value;
+      const units = parseInt(document.getElementById('q-units').value);
+      const contact = document.getElementById('q-contact').value.trim();
+
+      if (!name || !blood || !units || !contact) {
+        showAlert('req-alert', 'error', 'Please fill in all required fields.');
+        return;
+      }
+      if (units < 1) {
+        showAlert('req-alert', 'error', 'Units must be at least 1.');
+        return;
+      }
+
+      let selectedHosp = null;
+      let availableUnits = 0;
+      let hospName = 'Central Blood Bank';
+
+      if (hospId !== 'all') {
+        selectedHosp = hospitals.find(h => h.id === hospId);
+        if (selectedHosp) {
+          availableUnits = (selectedHosp.stock && selectedHosp.stock[blood]) || 0;
+          hospName = selectedHosp.name;
+        }
+      } else {
+        availableUnits = stock[blood] || 0;
+      }
+
+      if (availableUnits < units) {
+        showAlert('req-alert', 'error', `Insufficient stock at ${hospName}. Only ${availableUnits} unit(s) of ${blood} available.`);
+        return;
+      }
+
+      // Deduct from selected hospital if chosen
+      if (selectedHosp && selectedHosp.stock) {
+        selectedHosp.stock[blood] = Math.max(0, (selectedHosp.stock[blood] || 0) - units);
+      }
+
+      // Deduct from overall central stock
+      stock[blood] = Math.max(0, (stock[blood] || 0) - units);
+
+      const req = {
+        id: Date.now(),
+        name,
+        blood,
+        units,
+        contact,
+        hospital: hospName,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Fulfilled'
+      };
+
+      requests.push(req);
+      saveAll();
+
+      showAlert('req-alert', 'success', `✅ Request fulfilled! ${units} unit(s) of ${blood} allocated from ${hospName} to ${name}.`);
+
+      ['q-name', 'q-units', 'q-contact'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = id === 'q-units' ? '1' : '';
+      });
+
+      renderAll();
+    }
+
+    function renderReqStock() {
+      const el = document.getElementById('req-stock');
+      const titleEl = document.getElementById('req-stock-title');
+      const badgeEl = document.getElementById('req-stock-badge');
+      if (!el) return;
+
+      const hospId = document.getElementById('q-hospital')?.value || 'all';
+      let currentStockObj = stock;
+      let currentLabel = 'Central Blood Bank';
+
+      if (hospId !== 'all') {
+        const found = hospitals.find(h => h.id === hospId);
+        if (found && found.stock) {
+          currentStockObj = found.stock;
+          currentLabel = found.name;
+        }
+      }
+
+      if (titleEl) titleEl.textContent = 'Live Availability';
+      if (badgeEl) badgeEl.textContent = currentLabel;
+
+      el.innerHTML = BLOOD_GROUPS.map(g => {
+        const u = currentStockObj[g] || 0;
+        const low = u <= LOW_THRESHOLD;
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span class="badge badge-red" style="font-size:0.85rem">${g}</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:${u === 0 ? 'var(--text3)' : (low ? 'var(--crimson)' : 'var(--text)')}">
+              ${u} units ${u === 0 ? '(Out of stock)' : (low ? '⚠️ Low' : '✅')}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderReqHistory() {
+      const el = document.getElementById('req-history');
+      if (!el) return;
+      const recent = [...requests].reverse().slice(0, 8);
+      if (!recent.length) { el.innerHTML = '<p style="color:var(--text3);font-size:0.85rem">No requests recorded yet.</p>'; return; }
+      el.innerHTML = recent.map(r => `
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong style="font-size:0.875rem">${r.name}</strong>
+            <span class="badge badge-red">${r.blood} ×${r.units}</span>
+          </div>
+          <div style="color:var(--text2);font-size:0.78rem;margin-top:3px">
+            🏥 ${r.hospital || 'Central Blood Bank'}
+          </div>
+          <div style="color:var(--text3);font-size:0.75rem;margin-top:2px">
+            📅 ${r.date} • 📞 ${r.contact}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ──────────────────────────────────────────
+    // DASHBOARD
+    // ──────────────────────────────────────────
+    function renderDashboard() {
+      const totalUnits = BLOOD_GROUPS.reduce((s, g) => s + (stock[g] || 0), 0);
+      const lowGroups = BLOOD_GROUPS.filter(g => (stock[g] || 0) <= LOW_THRESHOLD);
+
+      const donorsEl = document.getElementById('h-donors');
+      const unitsEl = document.getElementById('h-units');
+      const hospEl = document.getElementById('h-hospitals');
+      const reqEl = document.getElementById('h-requests');
+      const lowEl = document.getElementById('h-low');
+
+      if (donorsEl) donorsEl.textContent = donors.length;
+      if (unitsEl) unitsEl.textContent = totalUnits;
+      if (hospEl) hospEl.textContent = hospitals.length;
+      if (reqEl) reqEl.textContent = requests.length;
+      if (lowEl) lowEl.textContent = lowGroups.length;
+
+      renderStockAlerts('urgent-alerts');
+      renderStockCards('dash-stock');
+
+      // Dashboard Hospital Quick Preview
+      const hp = document.getElementById('dash-hospitals-preview');
+      if (hp) {
+        hp.innerHTML = hospitals.slice(0, 4).map(h => {
+          const tot = BLOOD_GROUPS.reduce((sum, g) => sum + ((h.stock && h.stock[g]) || 0), 0);
+          return `
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="font-size:0.9rem; display:block">🏥 ${h.name}</strong>
+                <span style="font-size:0.78rem; color:var(--text2)">📍 ${h.city} • 📞 ${h.phone}</span>
+              </div>
+              <div style="text-align:right">
+                <span class="badge badge-blue" style="margin-bottom:4px">${tot} units</span>
+                <div>
+                  <button class="btn btn-secondary btn-sm" onclick="quickRequestHospital('${h.id}')" style="padding:4px 8px; font-size:0.75rem;">Request</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Recent donors
+      const rd = document.getElementById('recent-donors');
+      if (rd) {
+        const rDonors = [...donors].reverse().slice(0, 5);
+        rd.innerHTML = rDonors.length ? rDonors.map(d => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-weight:600;font-size:0.875rem">${d.name}</div>
+              <div style="color:var(--text3);font-size:0.75rem">${d.regDate} • 📞 ${d.phone}</div>
+            </div>
+            <span class="badge badge-red">${d.blood}</span>
+          </div>
+        `).join('') : '<p style="color:var(--text3);font-size:0.85rem">No donors registered yet.</p>';
+      }
+
+      // Recent requests
+      const rr = document.getElementById('recent-requests');
+      if (rr) {
+        const rReqs = [...requests].reverse().slice(0, 5);
+        rr.innerHTML = rReqs.length ? rReqs.map(r => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-weight:600;font-size:0.875rem">${r.name}</div>
+              <div style="color:var(--text3);font-size:0.75rem">${r.date} • 🏥 ${r.hospital || 'Central'}</div>
+            </div>
+            <span class="badge badge-blue">${r.blood} ×${r.units}</span>
+          </div>
+        `).join('') : '<p style="color:var(--text3);font-size:0.85rem">No requests placed yet.</p>';
+      }
+    }
+
+    // ──────────────────────────────────────────
+    // RENDER ALL & INIT
+    // ──────────────────────────────────────────
+    function renderAll() {
+      populateHospitalDropdown();
+      renderDashboard();
+      renderHospitals();
+      renderDonors();
+      renderStockCards('stock-cards');
+      renderStockAlerts('stock-alerts');
+      renderReqStock();
+      renderReqHistory();
+    }
+
+    // Check active login session on page load
+    (function initSession() {
+      const activeUser = load('bb_current_user', null);
+      if (activeUser && activeUser.email) {
+        updateUserBadge(activeUser);
+        navigate('dashboard');
+      } else {
+        navigate('auth');
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+
+      const colors = [
+        'rgba(192, 21, 42, 0.7)',   // Crimson
+        'rgba(139, 14, 30, 0.8)',   // Dark Crimson
+        'rgba(232, 41, 74, 0.6)',   // Light Crimson
+        'rgba(26, 107, 204, 0.5)',  // Azure
+        'rgba(192, 21, 42, 0.6)'    // Crimson
+      ];
+
+      let W, H;
+      let orbs = [];
+      let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+      class Orb {
+        constructor(color, size, speed) {
+          this.color = color;
+          this.baseSize = size;
+          this.size = size;
+          this.speed = speed;
+          this.cx = Math.random() * W;
+          this.cy = Math.random() * H;
+          this.angle = Math.random() * Math.PI * 2;
+          this.radius = Math.random() * 200 + 100;
+        }
+
+        update() {
+          this.angle += this.speed;
+
+          this.x = this.cx + Math.cos(this.angle) * this.radius;
+          this.y = this.cy + Math.sin(this.angle * 0.8) * this.radius;
+
+          // Smooth follow mouse
+          const dx = mouse.x - this.cx;
+          const dy = mouse.y - this.cy;
+          this.cx += dx * 0.005 * this.speed * 100;
+          this.cy += dy * 0.005 * this.speed * 100;
+
+          this.size = this.baseSize + Math.sin(this.angle * 2) * 50;
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+      }
+
+      function init() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        orbs = [];
+        const baseSizes = [450, 350, 500, 480, 300];
+        colors.forEach((c, i) => {
+          orbs.push(new Orb(c, baseSizes[i] || 400, (Math.random() * 0.003 + 0.001) * (i % 2 === 0 ? 1 : -1)));
+        });
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, W, H);
+
+        ctx.globalCompositeOperation = 'screen';
+        orbs.forEach(orb => {
+          orb.update();
+          orb.draw();
+        });
+        ctx.globalCompositeOperation = 'source-over';
+
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', init);
+      window.addEventListener('mousemove', e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      init();
+      loop();
+    })();
+  </script>
+</body>
+
+</html>
